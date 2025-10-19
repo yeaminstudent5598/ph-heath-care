@@ -25,7 +25,8 @@ const login = async (payload: {email:string, password: string}) => {
 
     return {
         accessToken,
-        refreshToken
+        refreshToken,
+        needPasswordChange: user.needPasswordChange
     }
 }
 

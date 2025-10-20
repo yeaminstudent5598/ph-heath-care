@@ -3,7 +3,9 @@ import { prisma } from "../../shared/prisma";
 import { createPatientInput } from "./user.interface";
 import bcrypt from "bcryptjs";
 import { fileUploader } from "../../helper/file.uploader";
-import { Admin, Doctor, UserRole } from "@prisma/client";
+import { Admin, Doctor, Prisma, UserRole } from "@prisma/client";
+import { IOptions, paginationHelper } from "../../helper/paginationHelper";
+import { userSearchableFields } from "./user.constant";
 
 
 const createPatient = async(req: Request) => {
@@ -93,36 +95,26 @@ const createDoctor = async (req: Request): Promise<Doctor> => {
 };
 
 
-const getAllFormDB = async ({page, limit, searchTerm, sortBy, sortOrder}: {page:number, limit:number, searchTerm?: any, sortBy: any, sortOrder: any}) => {
-    const pageNumber = page || 1;
-    const limitNumber = limit || 10;
-    const skip = (pageNumber - 1) * limitNumber;
-    const result = await prisma.user.findMany({
-        skip,
-        take: limitNumber,
+const getAllFromDB = async (params: any, options: IOptions) => {
+    const { page, limit, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(options)
+    const { searchTerm, ...filterData } = params;
 
-        where: {
-            email: {
-                contains: searchTerm,
-                mode: "insensitive"
-            }
-            
-        },
-        orderBy: sortBy && sortOrder ? {
-            [sortBy]: sortOrder
-        } : {
-            createdAt: "desc"
-        },
-        include: {
-            patient: true
-        }
-    });
-    return result
-}
+    const andConditions: Prisma.UserWhereInput[] = [];
 
+    if (searchTerm) {
+        andConditions.push({
+            OR: userSearchableFields.map(field => ({
+                [field]: {
+                    contains: searchTerm,
+                    mode: "insensitive"
+                }
+            }))
+        })
+    }
+};
 export const UserService = {
     createPatient,
     createAdmin,
     createDoctor,
-    getAllFormDB,
+    getAllFromDB,
 }

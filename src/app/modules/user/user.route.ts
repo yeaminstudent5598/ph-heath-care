@@ -10,7 +10,8 @@ const router = express.Router()
 
 router.get(
     "/",
-    UserController.getAllFormDB
+    auth(UserRole.ADMIN),
+    UserController.getAllFromDB
 )
 router.post(
     "/create-patient",

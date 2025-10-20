@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import catchAsync from "../../shared/catchAsync";
-import { UserService } from "./user.service";
 import sendResponse from "../../shared/sendResponse";
+import pick from "../../helper/pick";
+import { userFilterableFields } from "./user.constant";
+import { UserService } from "./user.service";
 
 const createPatient = catchAsync(async (req: Request, res: Response) => {
   const result = await UserService.createPatient(req);
@@ -38,9 +40,10 @@ const createDoctor = catchAsync(async (req: Request, res: Response) => {
     })
 });
 
-const getAllFormDB = catchAsync(async (req: Request, res: Response) => {
-  const { page, limit, searchTerm, sortBy, sortOrder} = req.query;
-  const result = await UserService.getAllFormDB({page: Number(page), limit: Number(limit), searchTerm, sortBy, sortOrder});
+const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
+  const filters = pick(req.query, userFilterableFields) // searching , filtering
+    const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]) // pagination and sorting
+    const result = await UserService.getAllFromDB(filters, options);
   sendResponse(res, {
     statusCode: 201,
     success: true,
@@ -53,5 +56,5 @@ export const UserController = {
     createPatient,
     createAdmin,
     createDoctor,
-    getAllFormDB,
+    getAllFromDB,
 }

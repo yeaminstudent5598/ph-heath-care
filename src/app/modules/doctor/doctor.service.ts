@@ -24,7 +24,7 @@ const getAllFromDB = async (filters: any, options: IOptions) => {
     // "", "medicine"
     if (specialties && specialties.length > 0) {
         andConditions.push({
-            doctorSpecialties: {
+            DoctorSpecialties: {
                 some: {
                     specialities: {
                         title: {
@@ -57,7 +57,7 @@ const getAllFromDB = async (filters: any, options: IOptions) => {
             [sortBy]: sortOrder
         },
         include: {
-            doctorSpecialties: {
+            DoctorSpecialties: {
                 include: {
                     specialities: true
                 }
@@ -120,7 +120,7 @@ const updateIntoDB = async (id: string, payload: Partial<IDoctorUpdateInput>) =>
             },
             data: doctorData,
             include: {
-                doctorSpecialties: {
+                DoctorSpecialties: {
                     include: {
                         specialities: true
                     }

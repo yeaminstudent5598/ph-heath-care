@@ -28,7 +28,7 @@ const getAllFromDB = async (filters: any, options: IOptions) => {
     // "", "medicine"
     if (specialties && specialties.length > 0) {
         andConditions.push({
-            DoctorSpecialties: {
+            doctorSpecialties: {
                 some: {
                     specialities: {
                         title: {
@@ -61,9 +61,14 @@ const getAllFromDB = async (filters: any, options: IOptions) => {
             [sortBy]: sortOrder
         },
         include: {
-            DoctorSpecialties: {
+            doctorSpecialties: {
                 include: {
                     specialities: true
+                }
+            },
+            reviews: {
+                select: {
+                    rating: true
                 }
             }
         }
@@ -124,7 +129,7 @@ const updateIntoDB = async (id: string, payload: Partial<IDoctorUpdateInput>) =>
             },
             data: doctorData,
             include: {
-                DoctorSpecialties: {
+                doctorSpecialties: {
                     include: {
                         specialities: true
                     }
@@ -147,7 +152,7 @@ const getByIdFromDB = async (id: string): Promise<Doctor | null> => {
             isDeleted: false,
         },
         include: {
-            DoctorSpecialties: {
+            doctorSpecialties: {
                 include: {
                     specialities: true,
                 },
@@ -156,7 +161,8 @@ const getByIdFromDB = async (id: string): Promise<Doctor | null> => {
                 include: {
                     schedule: true
                 }
-            }
+            },
+            reviews: true
         },
     });
     return result;
@@ -213,7 +219,7 @@ const getAISuggestions = async (payload: { symptoms: string }) => {
     const doctors = await prisma.doctor.findMany({
         where: { isDeleted: false },
         include: {
-            DoctorSpecialties: {
+            doctorSpecialties: {
                 include: {
                     specialities: true
                 }
